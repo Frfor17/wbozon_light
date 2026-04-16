@@ -1,3 +1,5 @@
+# тут логика работы бота, приём сообщение
+
 import asyncio
 import logging
 import requests

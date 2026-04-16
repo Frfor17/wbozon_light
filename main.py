@@ -1,3 +1,4 @@
+# тут чисто выставка рекламы в тг бота
 import requests
 import json
 from secret import ADSGRAM_URL, TGID, BLOCKID, LANGUAGE, TOKEN, BOT_TOKEN
