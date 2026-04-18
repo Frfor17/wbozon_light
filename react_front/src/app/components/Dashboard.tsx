@@ -1,11 +1,30 @@
 import { TrendingUp, TrendingDown, Package, DollarSign, ShoppingCart, AlertCircle, MessageSquare } from "lucide-react";
 import { Card } from "./ui/card";
+import { useEffect, useState } from "react";
 
 export default function Dashboard() {
+
+  const [productsCount, setProductsCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/products-count")
+      .then((res) => {
+      console.log("Response status:", res.status);
+      return res.json();
+      })
+      .then((data) => {
+      console.log("API data:", data); // тут должно быть {count: 1}
+      setProductsCount(data.count);
+      })
+      .catch((err) => {
+      console.error("Fetch error:", err);
+      });
+  }, []);
+
   const stats = [
     {
       label: "Продажи сегодня",
-      value: "127 450 ₽",
+      value: productsCount != null ? productsCount : "—",
       change: "+12.5%",
       trend: "up",
       icon: DollarSign,
