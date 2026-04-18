@@ -1,112 +1,235 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React from 'react';
+import { ScrollView, View, Text, TouchableOpacity } from 'react-native';
+import {
+  TrendingUp,
+  TrendingDown,
+  Package,
+  DollarSign,
+  ShoppingCart,
+  AlertCircle,
+  MessageSquare,
+} from 'lucide-react-native';
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
-
-export default function TabTwoScreen() {
+function Card({ children, style = {} }: any) {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <View
+      style={[
+        {
+          backgroundColor: '#fff',
+          borderRadius: 16,
+          padding: 16,
+          shadowColor: '#000',
+          shadowOpacity: 0.06,
+          shadowRadius: 10,
+          shadowOffset: { width: 0, height: 4 },
+          elevation: 2,
+        },
+        style,
+      ]}
+    >
+      {children}
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-});
+export default function Dashboard() {
+  const stats = [
+    {
+      label: 'Продажи сегодня',
+      value: '127 450 ₽',
+      change: '+12.5%',
+      trend: 'up',
+      icon: DollarSign,
+      color: '#16a34a',
+      bgColor: '#f0fdf4',
+    },
+    {
+      label: 'Заказы',
+      value: '47',
+      change: '+8.3%',
+      trend: 'up',
+      icon: ShoppingCart,
+      color: '#2563eb',
+      bgColor: '#eff6ff',
+    },
+    {
+      label: 'Товары в наличии',
+      value: '234',
+      change: '-5 шт',
+      trend: 'down',
+      icon: Package,
+      color: '#9333ea',
+      bgColor: '#faf5ff',
+    },
+    {
+      label: 'Требуют внимания',
+      value: '12',
+      change: '3 новых',
+      trend: 'alert',
+      icon: AlertCircle,
+      color: '#ea580c',
+      bgColor: '#fff7ed',
+    },
+  ];
+
+  const recentAlerts = [
+    { id: 1, message: 'Заканчивается товар: Кроссовки Nike Air Max', time: '15 мин назад', platform: 'WB' },
+    { id: 2, message: 'Конкурент снизил цену на -15%', time: '1 час назад', platform: 'Ozon' },
+    { id: 3, message: 'Новый отзыв на товар (4 звезды)', time: '2 часа назад', platform: 'WB' },
+  ];
+
+  const topProducts = [
+    { id: 1, name: 'Кроссовки Nike Air Max', sales: 23, revenue: '45 670 ₽', platform: 'WB' },
+    { id: 2, name: 'Футболка Adidas Original', sales: 18, revenue: '27 540 ₽', platform: 'Ozon' },
+    { id: 3, name: 'Куртка The North Face', sales: 12, revenue: '89 940 ₽', platform: 'WB' },
+  ];
+
+  return (
+    <ScrollView contentContainerStyle={{ padding: 16, gap: 16, backgroundColor: '#f8fafc' }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12 }}>
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          const trendColor =
+            stat.trend === 'up' ? '#16a34a' : stat.trend === 'down' ? '#dc2626' : '#ea580c';
+
+          return (
+            <Card key={stat.label} style={{ width: '48%' }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: stat.bgColor, alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon size={18} color={stat.color} />
+                </View>
+
+                {stat.trend === 'up' ? (
+                  <TrendingUp size={18} color="#16a34a" />
+                ) : stat.trend === 'down' ? (
+                  <TrendingDown size={18} color="#dc2626" />
+                ) : null}
+              </View>
+
+              <Text style={{ fontSize: 12, color: '#4b5563' }}>{stat.label}</Text>
+              <Text style={{ fontSize: 22, fontWeight: '700', color: '#111827', marginTop: 4 }}>{stat.value}</Text>
+              <Text style={{ fontSize: 12, color: trendColor, marginTop: 4 }}>{stat.change}</Text>
+            </Card>
+          );
+        })}
+      </View>
+
+      <Card style={{ backgroundColor: '#7c3aed' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <View style={{ width: 48, height: 48, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' }}>
+            <MessageSquare size={24} color="#fff" />
+          </View>
+
+          <View style={{ flex: 1 }}>
+            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600', marginBottom: 4 }}>
+              AI Ассистент готов помочь
+            </Text>
+            <Text style={{ color: '#ddd6fe', fontSize: 13 }}>
+              Задайте вопрос о продажах, товарах или стратегии
+            </Text>
+          </View>
+        </View>
+      </Card>
+
+      <View>
+        <Text style={{ fontSize: 14, fontWeight: '600', color: '#111827', marginBottom: 12 }}>
+          Важные уведомления
+        </Text>
+
+        <View style={{ gap: 8 }}>
+          {recentAlerts.map((alert) => (
+            <Card key={alert.id} style={{ paddingVertical: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
+                <AlertCircle size={16} color="#ea580c" style={{ marginTop: 2 }} />
+
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, color: '#111827' }}>{alert.message}</Text>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 }}>
+                    <Text style={{ fontSize: 12, color: '#6b7280' }}>{alert.time}</Text>
+                    <View
+                      style={{
+                        paddingHorizontal: 8,
+                        paddingVertical: 2,
+                        borderRadius: 999,
+                        backgroundColor: alert.platform === 'WB' ? '#f3e8ff' : '#dbeafe',
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 11,
+                          color: alert.platform === 'WB' ? '#7e22ce' : '#1d4ed8',
+                          fontWeight: '600',
+                        }}
+                      >
+                        {alert.platform}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </Card>
+          ))}
+        </View>
+      </View>
+
+      <View>
+        <Text style={{ fontSize: 14, fontWeight: '600', color: '#111827', marginBottom: 12 }}>
+          Топ товары сегодня
+        </Text>
+
+        <View style={{ gap: 8 }}>
+          {topProducts.map((product, index) => (
+            <Card key={product.id} style={{ paddingVertical: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <View style={{ width: 32, height: 32, borderRadius: 999, backgroundColor: '#f3e8ff', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#7e22ce' }}>#{index + 1}</Text>
+                </View>
+
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, fontWeight: '500', color: '#111827' }} numberOfLines={1}>
+                    {product.name}
+                  </Text>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 6 }}>
+                    <Text style={{ fontSize: 12, color: '#4b5563' }}>{product.sales} продаж</Text>
+                    <Text style={{ fontSize: 12, fontWeight: '600', color: '#16a34a' }}>{product.revenue}</Text>
+                    <View
+                      style={{
+                        paddingHorizontal: 8,
+                        paddingVertical: 2,
+                        borderRadius: 999,
+                        backgroundColor: product.platform === 'WB' ? '#f3e8ff' : '#dbeafe',
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 11,
+                          color: product.platform === 'WB' ? '#7e22ce' : '#1d4ed8',
+                          fontWeight: '600',
+                        }}
+                      >
+                        {product.platform}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </Card>
+          ))}
+        </View>
+      </View>
+
+      <TouchableOpacity
+        style={{
+          backgroundColor: '#ef4444',
+          paddingVertical: 14,
+          borderRadius: 12,
+          alignItems: 'center',
+        }}
+      >
+        <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>Поменять картинку</Text>
+      </TouchableOpacity>
+    </ScrollView>
+  );
+}

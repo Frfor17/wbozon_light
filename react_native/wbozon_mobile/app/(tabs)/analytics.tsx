@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dimensions, TouchableOpacity, View, Text } from 'react-native';
+import { Dimensions, TouchableOpacity, View, Text, Alert } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 
 const screenWidth = Dimensions.get('window').width;
@@ -19,6 +19,24 @@ const salesData = {
 };
 
 export default function AnalyticsScreen() {
+  const handlePress = async () => {
+    try {
+      await fetch('https://example.com/api/change-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          test: true,
+        }),
+      });
+
+      Alert.alert('OK', 'POST отправлен');
+    } catch (e) {
+      Alert.alert('Ошибка', 'Не удалось отправить запрос');
+    }
+  };
+
   return (
     <View style={{ flex: 1, padding: 16, backgroundColor: 'white' }}>
       <Text style={{ fontSize: 24, fontWeight: '700' }}>Аналитика</Text>
@@ -35,7 +53,10 @@ export default function AnalyticsScreen() {
       </View>
 
       <View style={{ alignItems: 'center', marginVertical: 20 }}>
-        <TouchableOpacity style={{ backgroundColor: '#ef4444', padding: 16, borderRadius: 8 }}>
+        <TouchableOpacity
+          style={{ backgroundColor: '#ef4444', padding: 16, borderRadius: 8 }}
+          onPress={handlePress}
+        >
           <Text style={{ color: 'white', fontSize: 18 }}>Поменять картинку</Text>
         </TouchableOpacity>
       </View>
