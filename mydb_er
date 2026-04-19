@@ -1,6 +1,0 @@
-digraph ER {
-	node [fillcolor=lightblue shape=box style=filled]
-	wb_cards [label=wb_cards]
-	sqlite_sequence [label=sqlite_sequence]
-	wb_stocks [label=wb_stocks]
-}
