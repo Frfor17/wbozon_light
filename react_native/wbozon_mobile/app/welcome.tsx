@@ -20,7 +20,7 @@ export default function WelcomeScreen() {
           Intelligent automation for Wildberries and Ozon sellers.
         </Text>
 
-        <TouchableOpacity style={styles.button} onPress={() => router.replace('/(tabs)/index')}>
+        <TouchableOpacity style={styles.button} onPress={() => router.replace('/setup')}>
           <Text style={styles.buttonText}>Get Started</Text>
           <ArrowRight size={20} color="#fff" />
         </TouchableOpacity>

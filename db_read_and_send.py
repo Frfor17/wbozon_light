@@ -6,7 +6,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # твой React‑порт
+    allow_origins=["http://localhost:5173"],  # React‑порт веб frontend
     allow_methods=["*"],
     allow_headers=["*"],
 )
