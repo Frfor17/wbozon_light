@@ -5,6 +5,7 @@ import Chat from "./components/Chat";
 import Products from "./components/Products";
 import Analytics from "./components/Analytics";
 import Settings from "./components/Settings";
+import Table from "./components/Table";
 
 export const router = createBrowserRouter([
   {
@@ -16,6 +17,7 @@ export const router = createBrowserRouter([
       { path: "products", Component: Products },
       { path: "analytics", Component: Analytics },
       { path: "settings", Component: Settings },
+      { path: "table", Component: Table },
     ],
   },
 ]);

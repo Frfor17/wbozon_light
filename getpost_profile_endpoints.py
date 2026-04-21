@@ -18,10 +18,33 @@ app.add_middleware(
 profiles_db = {"123456789": {"name": "ИП Борисов А.С.", "email": "seller@example.com", "id": "123456789"}}
 
 @app.get("/api/profile")
-async def get_profile():
-    profile = profiles_db.get("123456789")
-    print("🟢 GET - возвращаем:", profile)
-    return profile or {"name": None, "email": None, "id": None}
+async def get_profile(username: str = "123456789", db: sqlite3.Connection = Depends(get_db)):
+    print(f"🟢 GET - ищем профиль: {username}")
+    
+    try:
+        # SELECT из БД
+        cur = db.cursor()
+        cur.execute(
+            "SELECT id, username, email FROM users WHERE username = ?", 
+            (username,)
+        )
+        user = cur.fetchone()
+        
+        if user:
+            profile = {
+                "id": user[0],
+                "name": user[1],  # username как name
+                "email": user[2]
+            }
+            print(f"✅ Найден профиль: {profile}")
+            return profile
+        else:
+            print(f"⚠️ Профиль '{username}' не найден")
+            return {"id": None, "name": None, "email": None}
+            
+    except Exception as e:
+        print(f"❌ Ошибка БД: {e}")
+        raise HTTPException(status_code=500, detail="Ошибка получения профиля")
 
 # Тестовые роуты для кнопок
 @app.post("/api/profile/new")
@@ -36,19 +59,47 @@ async def edit_profile():
 async def update_settings():
     return {"status": "настройки сохранены"}
 
+Вот рефакторинг с реальным SQLite DELETE:
+
+python
+import sqlite3
+from fastapi import HTTPException
+
 @app.delete("/api/profile/delete")
-async def delete_profile():
+async def delete_profile(username: str = "123456789"):  # ← параметр из запроса
     print("🔴 DELETE - удаляем профиль...")
-    if "123456789" in profiles_db:
-        del profiles_db["123456789"]  # ← РЕАЛЬНОЕ удаление!
-        print("✅ ПРОФИЛЬ УДАЛЕН из БД!")
-    else:
-        print("⚠️ Профиль уже удален")
     
-    result = {"name": None, "email": None, "id": None, "status": "профиль удален ✅"}
-    print("📤 Ответ:", result)
-    print("-" * 50)
-    return result
+    conn = sqlite3.connect("mydb.db")
+    cur = conn.cursor()
+    
+    try:
+        # ✅ Реальное удаление из БД по username
+        result = cur.execute(
+            "DELETE FROM users WHERE username = ?", 
+            (username,)
+        ).rowcount  # ← количество удаленных строк
+        
+        conn.commit()
+        
+        if result > 0:
+            print(f"✅ Профиль '{username}' УДАЛЕН из БД!")
+            return {
+                "status": "профиль удален ✅", 
+                "deleted": username,
+                "rows_affected": result
+            }
+        else:
+            print(f"⚠️ Профиль '{username}' не найден")
+            raise HTTPException(status_code=404, detail="Профиль не найден")
+            
+    except Exception as e:
+        conn.rollback()
+        print(f"❌ Ошибка удаления: {e}")
+        raise HTTPException(status_code=500, detail="Ошибка БД")
+        
+    finally:
+        conn.close()
+        print("-" * 50)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router";
-import { Home, MessageSquare, Package, BarChart3, Settings } from "lucide-react";
+import { Home, MessageSquare, Package, BarChart3, Settings, Shapes } from "lucide-react";
 
 export default function Root() {
   const location = useLocation();
@@ -10,6 +10,7 @@ export default function Root() {
     { path: "/products", icon: Package, label: "Товары" },
     { path: "/analytics", icon: BarChart3, label: "Аналитика" },
     { path: "/settings", icon: Settings, label: "Настройки" },
+    { path: "/table", icon: Shapes, label: "Таблица" },
   ];
 
   return (
