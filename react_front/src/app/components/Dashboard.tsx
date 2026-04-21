@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 
 export default function Dashboard() {
 
-  const [productsCount, setProductsCount] = useState<number | null>(null);
+  const [salesToday, setSalesToday] = useState<number | null>(null);
+  const [ordersCounts, setOrdersCounts] = useState<number | null>(null);
+  const [goodsAvailable, setgoodsAvailable] = useState<number | null>(null);
+  const [needsAttention, setneedsAttention] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("http://localhost:8000/api/products-count")
@@ -14,7 +17,7 @@ export default function Dashboard() {
       })
       .then((data) => {
       console.log("API data:", data); // тут должно быть {count: 1}
-      setProductsCount(data.count);
+      setSalesToday(data.count);
       })
       .catch((err) => {
       console.error("Fetch error:", err);
@@ -24,7 +27,7 @@ export default function Dashboard() {
   const stats = [
     {
       label: "Продажи сегодня",
-      value: productsCount != null ? productsCount : "—",
+      value: salesToday != null ? salesToday : "—",
       change: "+12.5%",
       trend: "up",
       icon: DollarSign,
