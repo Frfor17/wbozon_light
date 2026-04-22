@@ -128,9 +128,9 @@ export default function Dashboard() {
         <h2 className="text-sm font-semibold text-gray-900 mb-3">Важные уведомления</h2>
         <div className="space-y-2">
           {recentAlerts.map((alert) => (
-            <Card key={alert.id} className="p-3 border-0 shadow-sm">
+            <Card key={alert.id} className={`p-3 border-0 shadow-sm ${alert.type === "stock" ? "bg-red-50/80 border-l-4 border-red-400" : ""}`}>
               <div className="flex items-start gap-3">
-                <AlertCircle className="size-4 text-orange-600 mt-0.5 flex-shrink-0" />
+                <AlertCircle className={`size-4 p-1 rounded-full ring-2 ${alert.type === "stock" ? "text-red-600 ring-red-300 bg-red-100" : "text-orange-600 ring-orange-300 bg-orange-100"} mt-0.5 flex-shrink-0`} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-900">{alert.message}</p>
                   <div className="flex items-center gap-2 mt-1">
@@ -155,7 +155,7 @@ export default function Dashboard() {
         <h2 className="text-sm font-semibold text-gray-900 mb-3">Топ товары сегодня</h2>
         <div className="space-y-2">
           {topProducts.map((product, index) => (
-            <Card key={product.id} className="p-3 border-0 shadow-sm">
+            <Card key={alert.id as any} className={`p-3 border-0 shadow-sm ${(alert as any).type === "stock" ? "bg-red-50" : ""}`}>
               <div className="flex items-center gap-3">
                 <div className="size-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <span className="text-sm font-semibold text-purple-700">#{index + 1}</span>

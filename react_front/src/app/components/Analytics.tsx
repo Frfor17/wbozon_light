@@ -1,27 +1,72 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from "recharts";
 import { Card } from "./ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { useState, useEffect } from "react";
 
 export default function Analytics() {
-  const salesData = [
-    { date: "Пн", wb: 45000, ozon: 32000 },
-    { date: "Вт", wb: 52000, ozon: 38000 },
-    { date: "Ср", wb: 48000, ozon: 35000 },
-    { date: "Чт", wb: 61000, ozon: 42000 },
-    { date: "Пт", wb: 55000, ozon: 45000 },
-    { date: "Сб", wb: 67000, ozon: 52000 },
-    { date: "Вс", wb: 58000, ozon: 48000 },
-  ];
+  const [period, setPeriod] = useState('week');
+  const [loading, setLoading] = useState(false);
+  const [apiData, setApiData] = useState(null);
 
-  const ordersData = [
-    { date: "Пн", orders: 34 },
-    { date: "Вт", orders: 42 },
-    { date: "Ср", orders: 38 },
-    { date: "Чт", orders: 51 },
-    { date: "Пт", orders: 45 },
-    { date: "Сб", orders: 58 },
-    { date: "Вс", orders: 47 },
-  ];
+  // 🔥 Загрузка реальных данных с твоего API
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Твой endpoint /api/sales?period={period}
+        const res = await fetch(`/api/sales?period=${period}`);
+        const data = await res.json();
+        setApiData(data);
+      } catch (err) {
+        console.error('API error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [period]);
+
+  const getMockData = () => {  // Пока API не готов — мок данные
+    const weekData = [
+      { date: "Пн", wb: 45000, ozon: 32000 },
+      { date: "Вт", wb: 52000, ozon: 38000 },
+      { date: "Ср", wb: 48000, ozon: 35000 },
+      { date: "Чт", wb: 61000, ozon: 42000 },
+      { date: "Пт", wb: 55000, ozon: 45000 },
+      { date: "Сб", wb: 67000, ozon: 52000 },
+      { date: "Вс", wb: 58000, ozon: 48000 },
+    ];
+
+    const monthData = Array.from({ length: 30 }, (_, i) => ({
+      date: `${i + 1}`,
+      wb: 45000 + Math.random() * 30000,
+      ozon: 32000 + Math.random() * 20000
+    }));
+
+    const labels = {
+      week: "7 дней",
+      month: "30 дней",
+      quarter: "90 дней",
+      year: "Год",
+      all: "Всё время"
+    };
+
+    return {
+      data: period === 'week' ? weekData : monthData.slice(0, period === 'month' ? 30 : 90),
+      periodLabel: labels[period],
+      totalSales: 0,  // из API
+      totalOrders: 0, // из API
+      avgCheck: 0     // из API
+    };
+  };
+
+  const salesData = apiData?.sales || getMockData().data;
+  const periodLabel = apiData?.periodLabel || getMockData().periodLabel;
+  const totalSales = apiData?.totalSales || salesData.reduce((sum, d) => sum + d.wb + d.ozon, 0);
+  const ordersData = salesData.map((item) => ({
+    date: item.date,
+    orders: 30 + Math.floor(Math.random() * 30)
+  }));
 
   const categoryData = [
     { category: "Обувь", sales: 156000 },
@@ -30,163 +75,111 @@ export default function Analytics() {
     { category: "Спорт", sales: 67000 },
   ];
 
+  if (loading) return <div className="p-4 text-center">Загрузка аналитики...</div>;
+
   return (
-    <div className="p-4 space-y-4">
-      {/* Header */}
+    <div className="p-4 space-y-4 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-xl font-semibold text-gray-900 mb-1">Аналитика</h1>
-        <p className="text-sm text-gray-600">Данные за последние 7 дней</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Аналитика продаж</h1>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-gray-600">Период:</span>
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            disabled={loading}
+          >
+            <option value="week">7 дней</option>
+            <option value="month">30 дней</option>
+            <option value="quarter">90 дней</option>
+            <option value="year">Год</option>
+            <option value="all">Всё время</option>
+          </select>
+          <span className="text-sm font-semibold text-gray-900 bg-gray-100 px-3 py-1 rounded-full">
+            {periodLabel}
+          </span>
+        </div>
       </div>
 
-      <Tabs defaultValue="sales" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="sales">Продажи</TabsTrigger>
-          <TabsTrigger value="orders">Заказы</TabsTrigger>
-          <TabsTrigger value="categories">Категории</TabsTrigger>
+      <Tabs defaultValue="sales" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 bg-white border shadow-sm rounded-xl p-1">
+          <TabsTrigger value="sales" className="data-[state=active]:bg-indigo-500 data-[state=active]:text-white rounded-lg">Продажи</TabsTrigger>
+          <TabsTrigger value="orders" className="data-[state=active]:bg-indigo-500 data-[state=active]:text-white rounded-lg">Заказы</TabsTrigger>
+          <TabsTrigger value="categories" className="data-[state=active]:bg-indigo-500 data-[state=active]:text-white rounded-lg">Категории</TabsTrigger>
         </TabsList>
 
-        {/* Sales Tab */}
+        {/* 📊 Продажи */}
         <TabsContent value="sales" className="space-y-4">
-          <Card className="p-4 border-0 shadow-sm">
-            <h3 className="font-medium text-gray-900 mb-4">Динамика продаж по платформам</h3>
-            <ResponsiveContainer width="100%" height={250}>
+          <Card className="p-6 shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Выручка по платформам ({periodLabel})</h3>
+            <ResponsiveContainer width="100%" height={300}>
               <BarChart data={salesData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis 
-                  dataKey="date" 
-                  tick={{ fill: '#6b7280', fontSize: 12 }}
-                  axisLine={{ stroke: '#e5e7eb' }}
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                <XAxis dataKey="date" tick={{ fill: '#6b7280', fontSize: 13 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#6b7280', fontSize: 13 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1e3}к`} />
+                <Tooltip
+                  contentStyle={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
+                  formatter={(value) => [`${value.toLocaleString()} ₽`, 'Выручка']}
                 />
-                <YAxis 
-                  tick={{ fill: '#6b7280', fontSize: 12 }}
-                  axisLine={{ stroke: '#e5e7eb' }}
-                  tickFormatter={(value) => `${value / 1000}k`}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#fff', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    fontSize: '12px'
-                  }}
-                  formatter={(value: number) => `${value.toLocaleString()} ₽`}
-                />
-                <Bar dataKey="wb" fill="#9333ea" name="Wildberries" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="ozon" fill="#3b82f6" name="Ozon" radius={[4, 4, 0, 0]} />
+                <Legend />
+                <Bar dataKey="wb" fill="#9333ea" name="Wildberries" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="ozon" fill="#3b82f6" name="Ozon" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </Card>
 
-          {/* Summary Cards */}
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="p-4 border-0 shadow-sm">
-              <p className="text-xs text-gray-600 mb-1">Всего продаж</p>
-              <p className="text-2xl font-semibold text-gray-900">386k ₽</p>
-              <p className="text-xs text-green-600 mt-1">+15.3% к прошлой неделе</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="p-6 text-center shadow-sm border-0 hover:shadow-md transition-shadow">
+              <p className="text-sm text-gray-600 mb-1">Общая выручка</p>
+              <p className="text-3xl font-bold text-gray-900">{totalSales.toLocaleString()} ₽</p>
+              <p className="text-sm text-emerald-600 font-medium mt-1">+15.3% к прошлому периоду</p>
             </Card>
-            <Card className="p-4 border-0 shadow-sm">
-              <p className="text-xs text-gray-600 mb-1">Средний чек</p>
-              <p className="text-2xl font-semibold text-gray-900">1 234 ₽</p>
-              <p className="text-xs text-green-600 mt-1">+8.7% к прошлой неделе</p>
+            <Card className="p-6 text-center shadow-sm border-0 hover:shadow-md transition-shadow">
+              <p className="text-sm text-gray-600 mb-1">Заказов</p>
+              <p className="text-3xl font-bold text-gray-900">
+                {ordersData.reduce((a, b) => a + b.orders, 0)}
+              </p>
+              <p className="text-sm text-emerald-600 font-medium mt-1">+8.2%</p>
+            </Card>
+            <Card className="p-6 text-center shadow-sm border-0 hover:shadow-md transition-shadow">
+              <p className="text-sm text-gray-600 mb-1">Средний чек</p>
+              <p className="text-3xl font-bold text-gray-900">
+                {Math.round(totalSales / ordersData.reduce((a, b) => a + b.orders, 0)).toLocaleString()} ₽
+              </p>
+              <p className="text-sm text-emerald-600 font-medium mt-1">+4.1%</p>
             </Card>
           </div>
         </TabsContent>
 
-        {/* Orders Tab */}
+        {/* 📈 Заказы */}
         <TabsContent value="orders" className="space-y-4">
-          <Card className="p-4 border-0 shadow-sm">
-            <h3 className="font-medium text-gray-900 mb-4">Количество заказов</h3>
-            <ResponsiveContainer width="100%" height={250}>
+          <Card className="p-6 shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Динамика заказов ({periodLabel})</h3>
+            <ResponsiveContainer width="100%" height={300}>
               <LineChart data={ordersData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis 
-                  dataKey="date" 
-                  tick={{ fill: '#6b7280', fontSize: 12 }}
-                  axisLine={{ stroke: '#e5e7eb' }}
-                />
-                <YAxis 
-                  tick={{ fill: '#6b7280', fontSize: 12 }}
-                  axisLine={{ stroke: '#e5e7eb' }}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#fff', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    fontSize: '12px'
-                  }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="orders" 
-                  stroke="#9333ea" 
-                  strokeWidth={2}
-                  dot={{ fill: '#9333ea', r: 4 }}
-                  name="Заказы"
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                <XAxis dataKey="date" tick={{ fill: '#6b7280', fontSize: 13 }} axisLine={false} />
+                <YAxis tick={{ fill: '#6b7280', fontSize: 13 }} axisLine={false} />
+                <Tooltip />
+                <Line type="monotone" dataKey="orders" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', strokeWidth: 2 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </Card>
-
-          {/* Order Stats */}
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="p-4 border-0 shadow-sm">
-              <p className="text-xs text-gray-600 mb-1">Всего заказов</p>
-              <p className="text-2xl font-semibold text-gray-900">315</p>
-              <p className="text-xs text-green-600 mt-1">+22.1% к прошлой неделе</p>
-            </Card>
-            <Card className="p-4 border-0 shadow-sm">
-              <p className="text-xs text-gray-600 mb-1">Конверсия</p>
-              <p className="text-2xl font-semibold text-gray-900">3.8%</p>
-              <p className="text-xs text-red-600 mt-1">-0.4% к прошлой неделе</p>
-            </Card>
-          </div>
         </TabsContent>
 
-        {/* Categories Tab */}
+        {/* 🏷️ Категории */}
         <TabsContent value="categories" className="space-y-4">
-          <Card className="p-4 border-0 shadow-sm">
-            <h3 className="font-medium text-gray-900 mb-4">Продажи по категориям</h3>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={categoryData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis 
-                  type="number"
-                  tick={{ fill: '#6b7280', fontSize: 12 }}
-                  axisLine={{ stroke: '#e5e7eb' }}
-                  tickFormatter={(value) => `${value / 1000}k`}
-                />
-                <YAxis 
-                  type="category"
-                  dataKey="category" 
-                  tick={{ fill: '#6b7280', fontSize: 12 }}
-                  axisLine={{ stroke: '#e5e7eb' }}
-                  width={80}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#fff', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    fontSize: '12px'
-                  }}
-                  formatter={(value: number) => `${value.toLocaleString()} ₽`}
-                />
-                <Bar 
-                  dataKey="sales" 
-                  fill="#9333ea" 
-                  name="Продажи"
-                  radius={[0, 4, 4, 0]}
-                />
+          <Card className="p-6 shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Топ категорий по выручке</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={categoryData} layout="vertical" margin={{ right: 40 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                <XAxis type="number" tick={{ fill: '#6b7280', fontSize: 13 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1e3}к`} />
+                <YAxis dataKey="category" type="category" tick={{ fill: '#6b7280', fontSize: 13 }} axisLine={false} tickLine={false} width={120} />
+                <Tooltip formatter={(value) => [`${value.toLocaleString()} ₽`, 'Выручка']} />
+                <Bar dataKey="sales" fill="#f59e0b" radius={[4, 4, 4, 4]} />
               </BarChart>
             </ResponsiveContainer>
-          </Card>
-
-          {/* Top Category */}
-          <Card className="p-4 border-0 shadow-sm bg-gradient-to-br from-purple-50 to-purple-100">
-            <p className="text-xs text-purple-700 mb-1">Лучшая категория</p>
-            <p className="text-xl font-semibold text-purple-900">Обувь</p>
-            <p className="text-sm text-purple-700 mt-1">156 000 ₽ • 35.8% от всех продаж</p>
           </Card>
         </TabsContent>
       </Tabs>

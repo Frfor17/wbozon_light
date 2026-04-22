@@ -23,7 +23,7 @@ export default function DataTable() {
 
     useEffect(() => {
         // ✅ endpoint Для приём данных мультитабличного запроса
-        fetch("http://localhost:8000/api/multi-table-data")
+        fetch("http://localhost:8001/api/multi-table-data")
             .then((res) => {
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 return res.json();

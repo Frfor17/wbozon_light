@@ -1,16 +1,17 @@
-import { Outlet, Link, useLocation } from "react-router";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import { Home, MessageSquare, Package, BarChart3, Settings, Shapes } from "lucide-react";
+import { PageTransition } from "./PageTransition";
 
 export default function Root() {
   const location = useLocation();
   
   const navItems = [
-    { path: "/", icon: Home, label: "Главная" },
-    { path: "/chat", icon: MessageSquare, label: "Ассистент" },
-    { path: "/products", icon: Package, label: "Товары" },
-    { path: "/analytics", icon: BarChart3, label: "Аналитика" },
-    { path: "/settings", icon: Settings, label: "Настройки" },
-    { path: "/table", icon: Shapes, label: "Таблица" },
+    { path: "/app", icon: Home, label: "Главная" },
+    { path: "/app/chat", icon: MessageSquare, label: "Ассистент" },
+    { path: "/app/products", icon: Package, label: "Товары" },
+    { path: "/app/analytics", icon: BarChart3, label: "Аналитика" },
+    { path: "/app/settings", icon: Settings, label: "Настройки" },
+    { path: "/app/table", icon: Shapes, label: "Таблица" },
   ];
 
   return (
