@@ -12,10 +12,13 @@ print("🚀 FastAPI запустился! Готов к логам")
 
 app = FastAPI(title="SellerAI Auth")
 
+#http://localhost:5173
+#http://111.88.149.68:5173
+#111.88.149.68
 # CORS для React
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # React dev server
+    allow_origins=["http://localhost:5173, "http://111.88.149.68:5173"],  # React dev server
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

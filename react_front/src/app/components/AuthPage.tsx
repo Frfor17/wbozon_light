@@ -20,7 +20,7 @@ export default function AuthPage() {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8000/api/login', {
+            const response = await fetch('http://111.88.149.68:8000/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(loginForm)
@@ -30,7 +30,7 @@ export default function AuthPage() {
             if (data.success) {
                 localStorage.setItem('user', JSON.stringify(data.user));
                 if (data.user.role === 'admin') {
-                    window.location.href = 'http://localhost:8000/admin';
+                    window.location.href = 'http://111.88.149.68:8000/admin';
                 
                 } else navigate('/app');
             } else {
@@ -49,7 +49,7 @@ export default function AuthPage() {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8000/api/register', {
+            const response = await fetch('http://111.88.149.68:8000/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(registerForm)
