@@ -47,7 +47,7 @@ export default function Settings() {
       };
       if (body) config.body = JSON.stringify(body);
 
-      const response = await fetch(`http://localhost:8000/api/${endpoint}`, config);
+      const response = await fetch(`http://localhost:8003/api/${endpoint}`, config);
       if (!response.ok) throw new Error('Ошибка сервера');
       return await response.json();
     } catch (error) {

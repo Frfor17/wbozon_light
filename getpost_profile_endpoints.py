@@ -1,7 +1,8 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import time
+import threading
 
 app = FastAPI()
 
@@ -14,6 +15,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+_local = threading.local()
+
+def get_db():
+    if not hasattr(_local, "conn"):
+        _local.conn = sqlite3.connect("mydb.db", check_same_thread=False)
+        _local.conn.row_factory = sqlite3.Row
+    return _local.conn
 
 profiles_db = {"123456789": {"name": "ИП Борисов А.С.", "email": "seller@example.com", "id": "123456789"}}
 
@@ -59,9 +67,6 @@ async def edit_profile():
 async def update_settings():
     return {"status": "настройки сохранены"}
 
-Вот рефакторинг с реальным SQLite DELETE:
-
-python
 import sqlite3
 from fastapi import HTTPException
 
@@ -73,7 +78,7 @@ async def delete_profile(username: str = "123456789"):  # ← параметр �
     cur = conn.cursor()
     
     try:
-        # ✅ Реальное удаление из БД по username
+        
         result = cur.execute(
             "DELETE FROM users WHERE username = ?", 
             (username,)
@@ -103,3 +108,6 @@ async def delete_profile(username: str = "123456789"):  # ← параметр �
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+#  uvicorn getpost_profile_endpoints:app --reload --host 0.0.0.0 --port 8003
