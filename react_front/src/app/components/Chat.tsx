@@ -9,6 +9,7 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  thinking?: string[]; // Новый массив для "мышления"
 }
 
 export default function Chat() {
@@ -53,7 +54,22 @@ export default function Chat() {
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI response
+    // 1. Создаем "thinking" сообщение СРАЗУ
+    const thinkingMessage: Message = {
+      id: Date.now() + 1,
+      role: "assistant",
+      content: "",
+      timestamp: new Date(),
+      thinking: [
+        "• Анализирую ваш запрос...",
+        "• Проверяю данные по продажам",
+        "• Формирую рекомендации"
+      ],
+    };
+
+    setMessages((prev) => [...prev, thinkingMessage]);
+
+    // 2. Через 1.5с заменяем на финальный ответ
     setTimeout(() => {
       const responses = [
         "Основываясь на анализе ваших продаж, рекомендую:\n\n1. Увеличить рекламный бюджет на топ-3 товара на 20%\n2. Оптимизировать описания товаров с высоким CTR\n3. Запустить акцию на товары с низкой конверсией\n\nХотите подробности по каждому пункту?",
@@ -62,14 +78,17 @@ export default function Chat() {
         "Для оптимизации ваших товаров на Wildberries рекомендую:\n\n✓ Добавить 3-5 ключевых слов в описание\n✓ Обновить фото товаров (увеличит CTR на 15-20%)\n✓ Проверить остатки - у 12 товаров критически низкий запас\n\nС чего начнём?",
       ];
 
-      const assistantMessage: Message = {
-        id: Date.now(),
+      const finalMessage: Message = {
+        id: thinkingMessage.id, // ТОТ ЖЕ ID - заменяем!
         role: "assistant",
         content: responses[Math.floor(Math.random() * responses.length)],
         timestamp: new Date(),
+        thinking: undefined, // Убираем thinking
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      setMessages((prev) =>
+        prev.map((msg) => (msg.id === thinkingMessage.id ? finalMessage : msg))
+      );
       setIsTyping(false);
     }, 1500);
   };
@@ -85,17 +104,15 @@ export default function Chat() {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex gap-3 ${
-              message.role === "user" ? "flex-row-reverse" : "flex-row"
-            }`}
+            className={`flex gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"
+              }`}
           >
             {/* Avatar */}
             <div
-              className={`size-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                message.role === "user"
-                  ? "bg-purple-600"
-                  : "bg-gradient-to-br from-purple-500 to-purple-600"
-              }`}
+              className={`size-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.role === "user"
+                ? "bg-purple-600"
+                : "bg-gradient-to-br from-purple-500 to-purple-600"
+                }`}
             >
               {message.role === "user" ? (
                 <User className="size-4 text-white" />
@@ -106,16 +123,14 @@ export default function Chat() {
 
             {/* Message Bubble */}
             <div
-              className={`flex-1 max-w-[80%] ${
-                message.role === "user" ? "items-end" : "items-start"
-              }`}
+              className={`flex-1 max-w-[80%] ${message.role === "user" ? "items-end" : "items-start"
+                }`}
             >
               <Card
-                className={`p-3 shadow-sm border-0 ${
-                  message.role === "user"
-                    ? "bg-purple-600 text-white"
-                    : "bg-white text-gray-900"
-                }`}
+                className={`p-3 shadow-sm border-0 ${message.role === "user"
+                  ? "bg-purple-600 text-white"
+                  : "bg-white text-gray-900"
+                  }`}
               >
                 <p className="text-sm whitespace-pre-line">{message.content}</p>
               </Card>
