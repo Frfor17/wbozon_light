@@ -7,15 +7,15 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 dp = Dispatcher()
-
-@dp.message(Command("decision"), F.chat.id == GROUP_ID)
+# , F.chat.id == GROUP_ID
+@dp.message(Command("decision"))
 async def custdev_handler(message: Message):
     await message.answer(
         "Исходя из данных по конвертации лидов из тг чатов, принято решение остановить эту деятельность на время"
     )
 
 async def main():
-    bot = Bot(token=TOKEN)
+    bot = Bot(token=TOKENS[1])
     logging.basicConfig(level=logging.INFO)
     await dp.start_polling(bot)
 
